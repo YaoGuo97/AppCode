@@ -589,68 +589,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private static final int CAMERA_ROTATION_MIN_VALUE = -100;
         // 摄像机云台旋转最大值
         private static final int CAMERA_ROTATION_MAX_VALUE = 100;
-        // 消息周期
-        private static final long MESSAGE_SEND_DELAY_TIME = 200;
-
-        // boolean handleMessage(@NonNull Message msg)
-        private Handler handler = new Handler(msg -> {
-            switch (msg.what) {
-                case R.id.camera_to_up:
-                    if (cameraV < CAMERA_ROTATION_MAX_VALUE) {
-                        cameraV += CAMERA_ROTATION_STEP_VALUE;
-                    }
-                    sendControlMessage("camera_to_up");
-                    break;
-                case R.id.camera_to_right:
-                    if (cameraH < CAMERA_ROTATION_MAX_VALUE) {
-                        cameraH += CAMERA_ROTATION_STEP_VALUE;
-                    }
-                    sendControlMessage("camera_to_right");
-                    break;
-                case R.id.camera_to_down:
-                    if (cameraV > CAMERA_ROTATION_MIN_VALUE) {
-                        cameraV -= CAMERA_ROTATION_STEP_VALUE;
-                    }
-                    sendControlMessage("camera_to_down");
-                    break;
-                case R.id.camera_to_left:
-                    if (cameraH > CAMERA_ROTATION_MIN_VALUE) {
-                        cameraH -= CAMERA_ROTATION_STEP_VALUE;
-                    }
-                    sendControlMessage("camera_to_left");
-                    break;
-            } // switch (msg.what)
-            updateInfo();
-            return false;
-        }); // private Handler handler
-
-        private ScheduledExecutorService scheduledExecutor;
-
-        /**
-         * 按下按钮时执行
-         *
-         * @param viewId 按钮的 ID
-         */
-        private void startSendMsg(final int viewId) {
-            scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-            scheduledExecutor.scheduleWithFixedDelay(() -> {
-                Message msg = new Message();
-                msg.what = viewId;
-                handler.sendMessage(msg);
-                Log.d(TAG, "CameraControlListener: startSendMsg: 发送消息");
-            }, 0, MESSAGE_SEND_DELAY_TIME, TimeUnit.MILLISECONDS);
-        }
-
-        /**
-         * 松开按钮时执行
-         */
-        private void stopSendMsg() {
-            Log.d(TAG, "CameraControlListener: stopSendMsg: 停止发送消息");
-            if (scheduledExecutor != null) {
-                scheduledExecutor.shutdownNow();
-                scheduledExecutor = null;
-            }
-        }
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
