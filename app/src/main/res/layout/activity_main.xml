@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:gravity="bottom|center"
+    android:orientation="vertical"
+    android:padding="0dp"
+    tools:context=".activity.MainActivity">
+
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="640dp"
+        android:layout_height="480dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#55000000"
+        android:gravity="center_vertical"
+        android:padding="2dp"
+        android:text="武汉商学院信息工程学院\n2020届物联网工程毕业设计\n毕设题目：基于Arduino和树莓派的无线视频小车\n毕设作者:刘祖耀\n指导老师:刘佳"
+        android:textColor="#FFF"
+        android:textSize="8sp"
+        app:layout_constraintStart_toStartOf="@+id/web_view"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--   //小车控制按键-->
+
+    <TextView
+        android:id="@+id/recv_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#55000000"
+        android:padding="2dp"
+        android:textColor="#FFF"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@+id/debug_info_tv"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="turn_right" />
+
+    <TextView
+        android:id="@+id/debug_info_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#55000000"
+        android:padding="2dp"
+        android:textColor="#FFF"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/web_view"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="左轮速度: 200\n右轮速度: 200\n调试信息:\n控制方向: 前进\n水平舵机: 0\n垂直舵机: 0\n左侧电机: 200\n右侧电机: 200" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/control_container"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/btn_forward"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_up"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btn_turn_right"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_right"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_down"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btn_turn_left"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_left"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- //舵机控制按键
+-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/shot_container"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/camera_to_up"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_up"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/camera_to_right"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_right"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/camera_to_down"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_down"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/camera_to_left"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_left"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--电机控制按键-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/shot_container"
+        app:layout_constraintStart_toEndOf="@+id/control_container">
+
+        <ImageButton
+            android:id="@+id/reconnect_btn"
+            style="@style/control_btn_style"
+            android:layout_weight="1"
+            android:src="@drawable/ic_reset" />
+
+        <ImageButton
+            android:id="@+id/settings_btn"
+            style="@style/control_btn_style"
+            android:layout_weight="1"
+            android:src="@drawable/ic_settings" />
+
+        <ImageButton
+            android:id="@+id/snapshot_btn"
+            style="@style/control_btn_style"
+            android:layout_weight="1"
+            android:src="@drawable/ic_snapshot" />
+
+        <Switch
+            android:id="@+id/model_change_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/shot_container"
+            app:layout_constraintStart_toEndOf="@+id/control_container"
+            app:layout_constraintTop_toTopOf="@+id/settings_btn"
+            tools:targetApi="lollipop" />
+
+        <TextView
+            android:id="@+id/model_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="遥控模式" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.32999998">
+
+        <ImageButton
+            android:id="@+id/left_em_up"
+            style="@style/control_btn_style"
+            android:src="@drawable/ic_up" />
+
+        <ImageButton
+            android:id="@+id/left_em_down"
+            style="@style/control_btn_style"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_down" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/linearLayout">
+
+        <ImageButton
+            android:id="@+id/right_em_up"
+            style="@style/control_btn_style"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_up" />
+
+        <ImageButton
+            android:id="@+id/right_em_down"
+            style="@style/control_btn_style"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_down" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
