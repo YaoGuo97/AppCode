@@ -8,81 +8,91 @@ public abstract class Instruction {
     /**
      * 前进
      */
-    public static String CAR_FORWARD = "cfw";
+    public static final String CAR_FORWARD = "cfw";
 
     /**
      * 后退
      */
-    public static String CAR_BACK = "cbo";
+    public static final String CAR_BACK = "cbo";
 
     /**
      * 左转
      */
-    public static String CAR_TURN_LEFT = "clt";
+    public static final String CAR_TURN_LEFT = "clt";
 
     /**
      * 右转
      */
-    public static String CAR_TURN_RIGHT = "crt";
+    public static final String CAR_TURN_RIGHT = "crt";
 
     /**
      * 松开
      */
-    public static String KEY_UP = "cop";
+    public static final String KEY_UP = "cop";
 
     /**
      * 向上
      */
-    public static String SE_UP = "sefw";
+    public static final String SE_UP = "sefw";
 
     /**
      * 向下
      */
-    public static String SE_DOWN = "sebo";
+    public static final String SE_DOWN = "sebo";
 
     /**
      * 向左
      */
-    public static String SE_LEFT = "selt";
+    public static final String SE_LEFT = "selt";
 
     /**
      * 向右
      */
-    public static String SE_RIGHT = "sert";
+    public static final String SE_RIGHT = "sert";
 
     /**
      * 按键松开
      */
-    public static String SE_KEY_UP = "seop";
+    public static final String SE_KEY_UP = "seop";
 
     /**
      * 电机左上
      */
-    public static String EM_LEFT_UP = "emlfw";
+    public static final String EM_UP = "emlfw";
 
     /**
      * 电机左下
      */
-    public static String EM_LEFT_DOWN = "emlbo";
+    public static final String EM_DOWN = "emlbo";
 
     /**
-     * 电机右上
+     * 开灯
      */
-    public static String EM_RIGHT_UP = "emrfw";
+    public static final String LIGHT_ON = "lao";
 
     /**
-     * 电机右下
+     * 关灯
      */
-    public static String EM_RIGHT_DOWN = "emrbo";
+    public static final String LIGHT_OFF = "las";
+
+    /**
+     * 关机
+     */
+    public static final String SHUTDOWN = "pshut";
 
     /**
      * 遥控
      */
-    public static String MODE_CONTROL = "ct";
+    public static final String MODE_CONTROL = "ct";
 
     /**
      * 避障
      */
-    public static String MODE_AUTO = "oa";
+    public static final String MODE_AUTO = "oa";
+
+    /**
+     * 寻迹
+     */
+    public static final String MODE_TR = "tr";
 
 }

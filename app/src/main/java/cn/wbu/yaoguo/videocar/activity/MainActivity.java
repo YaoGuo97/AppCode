@@ -17,7 +17,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
-import android.widget.Switch;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,12 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.URI;
 import java.net.URL;
-import java.util.EventListener;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import cn.wbu.yaoguo.videocar.R;
 import cn.wbu.yaoguo.videocar.constant.Instruction;
@@ -105,29 +100,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton cameraToDownBtn; // 舵机云台 下
     private ImageButton cameraToLeftBtn; // 舵机云台 左
     private ImageButton cameraToRightBtn; // 舵机云台 右
-    private ImageButton leftEmUpBtn;
-    private ImageButton leftEmDownBtn;
-    private ImageButton rightEmUpBtn;
-    private ImageButton rightEmDownBtn;
+    private ImageButton emUpBtn; // 加速
+    private ImageButton emDownBtn; // 减速
 
+    private SeekBar modelChangeSeekBar; // 模式切换
     private ImageButton reconnectBtn; // 重新连接
     private ImageButton settingsBtn; // 设置
+    private ImageButton shutdownBtn; // 关机
+
     private ImageButton snapshotBtn; // 拍照
-    private Switch modelChangeBtn; // 模式切换
+    private ImageButton lightSwitchBtn; // 灯光
 
     // 信息
     private TextView recvMsgTv; // 回显信息
     private TextView debugInfoTv; // 调试信息
-    private TextView modelTv; // 模式信息
 
     // 状态
     private String direction = "静止";
-    private int cameraH = 0; // 舵机云台 水平
-    private int cameraV = 0; // 舵机云台 垂直
-    private int leftWheel = 0; // 电机 左
-    private int rightWheel = 0; // 电机 右
-    private int leftSpeed = 200;
-    private int rightSpeed = 200;
+    private String cameraV = "静止";
+    private String cameraH = "静止";
+    private int wheel = 0; // 电机
+    private int speed = 200; // 速度
+    private boolean lightStatus = false; // 灯光状态 true开 false关
 
     private Handler mainHandler;
 
@@ -158,19 +152,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cameraToLeftBtn = findViewById(R.id.camera_to_left);
         cameraToRightBtn = findViewById(R.id.camera_to_right);
 
-        leftEmUpBtn = findViewById(R.id.left_em_up);
-        leftEmDownBtn = findViewById(R.id.left_em_down);
-        rightEmUpBtn = findViewById(R.id.right_em_up);
-        rightEmDownBtn = findViewById(R.id.right_em_down);
+        emUpBtn = findViewById(R.id.em_up_btn);
+        emDownBtn = findViewById(R.id.em_down_btn);
 
+        modelChangeSeekBar = findViewById(R.id.mode_seek_bar);
         reconnectBtn = findViewById(R.id.reconnect_btn);
         settingsBtn = findViewById(R.id.settings_btn);
+        shutdownBtn = findViewById(R.id.shutdown_btn);
+
         snapshotBtn = findViewById(R.id.snapshot_btn);
-        modelChangeBtn = findViewById(R.id.model_change_btn);
+        lightSwitchBtn = findViewById(R.id.light_switch_btn);
 
         recvMsgTv = findViewById(R.id.recv_msg_tv);
         debugInfoTv = findViewById(R.id.debug_info_tv);
-        modelTv = findViewById(R.id.model_tv);
 
         webView = findViewById(R.id.web_view);
 
@@ -194,10 +188,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cameraToLeftBtn.setOnTouchListener(cameraControlListener);
         cameraToRightBtn.setOnTouchListener(cameraControlListener);
 
-        leftEmUpBtn.setOnClickListener(this);
-        leftEmDownBtn.setOnClickListener(this);
-        rightEmUpBtn.setOnClickListener(this);
-        rightEmDownBtn.setOnClickListener(this);
+        emUpBtn.setOnClickListener(this);
+        emDownBtn.setOnClickListener(this);
 
         reconnectBtn.setOnClickListener((v) -> {
             // 断开 TCP
@@ -211,6 +203,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(MainActivity.this, IpAddressActivity.class);
             startActivityForResult(intent, IP_ADDRESS_RESULT_CODE);
         });
+
+        // 关机
+        shutdownBtn.setOnClickListener(this);
 
         // 拍照按钮
         snapshotBtn.setOnClickListener((v) -> new Thread(() -> {
@@ -255,14 +250,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(imgFile)));
         }).start());
 
+        // 灯光按钮
+        lightSwitchBtn.setOnClickListener(this);
+
         // 模式切换
-        modelChangeBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                sendControlMessage(Instruction.MODE_AUTO);
-                modelTv.setText("避障模式");
-            } else {
-                sendControlMessage(Instruction.MODE_CONTROL);
-                modelTv.setText("遥控模式");
+        modelChangeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progress = seekBar.getProgress();
+                switch (progress) {
+                    case 0:
+                        sendControlMessage(Instruction.MODE_AUTO);
+                        break;
+                    case 1:
+                        sendControlMessage(Instruction.MODE_CONTROL);
+                        break;
+                    case 2:
+                        sendControlMessage(Instruction.MODE_TR);
+                        break;
+                }
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
             }
         });
     }
@@ -322,32 +336,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.left_em_up: // 左侧电机增加
-                if (leftWheel < WHEEL_MAX_SPEED) {
-                    leftWheel += WHEEL_SPEED_STEP_VALUE;
-                    leftSpeed += WHEEL_SPEED_STEP_VALUE;
-                    sendControlMessage(Instruction.EM_LEFT_UP);
+            case R.id.em_up_btn: // 左侧电机增加
+                if (wheel < WHEEL_MAX_SPEED) {
+                    wheel += WHEEL_SPEED_STEP_VALUE;
+                    speed += WHEEL_SPEED_STEP_VALUE;
+                    sendControlMessage(Instruction.EM_UP);
                 }
                 break;
-            case R.id.left_em_down: // 左侧电机减少
-                if (leftWheel > WHEEL_MIN_SPEED) {
-                    leftWheel -= WHEEL_SPEED_STEP_VALUE;
-                    leftSpeed -= WHEEL_SPEED_STEP_VALUE;
-                    sendControlMessage(Instruction.EM_LEFT_DOWN);
+            case R.id.em_down_btn: // 左侧电机减少
+                if (wheel > WHEEL_MIN_SPEED) {
+                    wheel -= WHEEL_SPEED_STEP_VALUE;
+                    speed -= WHEEL_SPEED_STEP_VALUE;
+                    sendControlMessage(Instruction.EM_DOWN);
                 }
                 break;
-            case R.id.right_em_up: // 右侧电机增加
-                if (rightWheel < WHEEL_MAX_SPEED) {
-                    rightWheel += WHEEL_SPEED_STEP_VALUE;
-                    rightSpeed += WHEEL_SPEED_STEP_VALUE;
-                    sendControlMessage(Instruction.EM_RIGHT_UP);
-                }
+            case R.id.shutdown_btn: // 关机
+                sendControlMessage(Instruction.SHUTDOWN);
                 break;
-            case R.id.right_em_down: // 右侧电机减少
-                if (rightWheel > WHEEL_MIN_SPEED) {
-                    rightWheel -= WHEEL_SPEED_STEP_VALUE;
-                    rightSpeed -= WHEEL_SPEED_STEP_VALUE;
-                    sendControlMessage(Instruction.EM_RIGHT_DOWN);
+            case R.id.light_switch_btn: // 灯光
+                if (lightStatus) {
+                    sendControlMessage(Instruction.LIGHT_OFF);
+                    lightSwitchBtn.setColorFilter(getResources().getColor(R.color.light_off));
+                    lightStatus = false;
+                } else {
+                    sendControlMessage(Instruction.LIGHT_ON);
+                    lightSwitchBtn.setColorFilter(getResources().getColor(R.color.light_on));
+                    lightStatus = true;
                 }
                 break;
         } // switch (v.getId())
@@ -361,14 +375,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void updateInfo() {
         debugInfoTv.setText(
                 new StringBuffer()
-                        .append("左轮速度: ").append(rightSpeed)
-                        .append("\n右轮速度: ").append(leftSpeed)
+                        .append("小车速度: ").append(speed)
                         .append("\n调试信息:\n")
                         .append("控制方向: ").append(direction).append('\n')
                         .append("水平舵机: ").append(cameraH).append('\n')
                         .append("垂直舵机: ").append(cameraV).append('\n')
-                        .append("左侧电机: ").append(leftWheel).append('\n')
-                        .append("右侧电机: ").append(rightWheel)
+                        .append("电机转速: ").append(wheel)
         );
     }
 
@@ -583,49 +595,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private class CameraControlListener implements View.OnTouchListener {
 
-        // 摄像机云台旋转步长
-        private static final int CAMERA_ROTATION_STEP_VALUE = 1;
-        // 摄像机云台旋转最小值
-        private static final int CAMERA_ROTATION_MIN_VALUE = -100;
-        // 摄像机云台旋转最大值
-        private static final int CAMERA_ROTATION_MAX_VALUE = 100;
-
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: // 按下
                     switch (v.getId()) {
                         case R.id.camera_to_up:
-                            if (cameraV < CAMERA_ROTATION_MAX_VALUE) {
-                                cameraV += CAMERA_ROTATION_STEP_VALUE;
-                                sendControlMessage(Instruction.SE_UP);
-                            }
+                            sendControlMessage(Instruction.SE_UP);
+                            cameraV = "向上";
                             break;
                         case R.id.camera_to_right:
-                            if (cameraH < CAMERA_ROTATION_MAX_VALUE) {
-                                cameraH += CAMERA_ROTATION_STEP_VALUE;
-                                sendControlMessage(Instruction.SE_RIGHT);
-                            }
+                            sendControlMessage(Instruction.SE_RIGHT);
+                            cameraH = "向右";
                             break;
                         case R.id.camera_to_down:
-                            if (cameraV > CAMERA_ROTATION_MIN_VALUE) {
-                                cameraV -= CAMERA_ROTATION_STEP_VALUE;
-                                sendControlMessage(Instruction.SE_DOWN);
-                            }
+                            sendControlMessage(Instruction.SE_DOWN);
+                            cameraV = "向下";
                             break;
                         case R.id.camera_to_left:
-                            if (cameraH > CAMERA_ROTATION_MIN_VALUE) {
-                                cameraH -= CAMERA_ROTATION_STEP_VALUE;
-                                sendControlMessage(Instruction.SE_LEFT);
-                            }
+                            sendControlMessage(Instruction.SE_LEFT);
+                            cameraH = "向左";
                             break;
                     } // switch (msg.what)
-                    updateInfo();
                     Log.d(TAG, "CameraControlListener: onTouch: 按下");
+                    updateInfo();
                     break;
                 case MotionEvent.ACTION_UP: // 松开
                     sendControlMessage(Instruction.SE_KEY_UP);
+                    cameraV = "静止";
+                    cameraH = "静止";
                     Log.d(TAG, "CameraControlListener: onTouch: 松开");
+                    updateInfo();
                     break;
             } // switch (event.getAction())
             return false;

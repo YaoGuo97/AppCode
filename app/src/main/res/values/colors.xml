@@ -3,4 +3,7 @@
     <color name="colorPrimary">#2196F3</color>
     <color name="colorPrimaryDark">#2196F3</color>
     <color name="colorAccent">#2196F3</color>
+
+    <color name="light_off">#555555</color>
+    <color name="light_on">#C99D00</color>
 </resources>

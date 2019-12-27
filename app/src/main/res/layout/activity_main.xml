@@ -58,6 +58,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="左轮速度: 200\n右轮速度: 200\n调试信息:\n控制方向: 前进\n水平舵机: 0\n垂直舵机: 0\n左侧电机: 200\n右侧电机: 200" />
 
+    <!--电机控制按键-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/control_container"
         android:layout_width="150dp"
@@ -142,8 +143,8 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!--电机控制按键-->
     <LinearLayout
+        android:id="@+id/control_linear_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -165,26 +166,11 @@
             android:src="@drawable/ic_settings" />
 
         <ImageButton
-            android:id="@+id/snapshot_btn"
+            android:id="@+id/shutdown_btn"
             style="@style/control_btn_style"
             android:layout_weight="1"
-            android:src="@drawable/ic_snapshot" />
+            android:src="@drawable/ic_power" />
 
-        <Switch
-            android:id="@+id/model_change_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/shot_container"
-            app:layout_constraintStart_toEndOf="@+id/control_container"
-            app:layout_constraintTop_toTopOf="@+id/settings_btn"
-            tools:targetApi="lollipop" />
-
-        <TextView
-            android:id="@+id/model_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="遥控模式" />
     </LinearLayout>
 
     <LinearLayout
@@ -198,12 +184,12 @@
         app:layout_constraintVertical_bias="0.32999998">
 
         <ImageButton
-            android:id="@+id/left_em_up"
+            android:id="@+id/em_up_btn"
             style="@style/control_btn_style"
             android:src="@drawable/ic_up" />
 
         <ImageButton
-            android:id="@+id/left_em_down"
+            android:id="@+id/em_down_btn"
             style="@style/control_btn_style"
             android:layout_width="56dp"
             android:layout_height="56dp"
@@ -212,7 +198,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -220,19 +205,60 @@
         app:layout_constraintTop_toTopOf="@+id/linearLayout">
 
         <ImageButton
-            android:id="@+id/right_em_up"
+            android:id="@+id/snapshot_btn"
             style="@style/control_btn_style"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:src="@drawable/ic_up" />
+            android:layout_weight="1"
+            android:src="@drawable/ic_snapshot" />
 
         <ImageButton
-            android:id="@+id/right_em_down"
+            android:id="@+id/light_switch_btn"
             style="@style/control_btn_style"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:src="@drawable/ic_down" />
+            android:layout_weight="1"
+            android:src="@drawable/ic_sunny" />
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/control_linear_layout"
+        app:layout_constraintEnd_toEndOf="@+id/control_linear_layout"
+        app:layout_constraintStart_toStartOf="@+id/control_linear_layout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="避障模式"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="遥控模式"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="寻迹模式"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/mode_seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="2"
+            android:progress="0" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
