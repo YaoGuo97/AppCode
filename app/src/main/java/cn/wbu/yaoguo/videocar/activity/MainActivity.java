@@ -304,9 +304,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         controlIpAddress = sp.getString("controlIpAddress", null);
 
-        if (videoUrl == null && imgUrl == null) {
-
-        }
+        if (videoUrl == null && imgUrl == null) {}
     }
 
     private void initOther() {
